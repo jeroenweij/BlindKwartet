@@ -1,8 +1,8 @@
-#include <stdarg.h>
 
+
+#include "textRender.h"
 #include "characters.h"
 #include "stdint.h"
-#include "textRender.h"
 
 void RenderPrintText(Pixel pixels[heigth][width], uint16_t x, const uint16_t y, const Pixel& color, const std::string text)
 {
@@ -24,17 +24,4 @@ void RenderPrintText(Pixel pixels[heigth][width], uint16_t x, const uint16_t y, 
             }
         }
     }
-}
-
-#define PRINT_BUF_LEN 100
-void PrintfText(Pixel pixels[heigth][width], uint16_t x, const uint16_t y, const Pixel& color, const char* fmt, ...)
-{
-    static char buf[PRINT_BUF_LEN];
-    va_list     va;
-
-    va_start(va, fmt);
-    vsnprintf(buf, PRINT_BUF_LEN, fmt, va);
-    va_end(va);
-
-    RenderPrintText(pixels, x, y, color, buf);
 }

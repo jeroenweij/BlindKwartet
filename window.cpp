@@ -1,6 +1,7 @@
 #include <GLFW/glfw3.h>
 #include <iostream>
 #include <math.h>
+#include <stdarg.h>
 #include <thread>
 
 #include "textRender.h"
@@ -40,7 +41,7 @@ void Window::Thread()
         }
         else
         {
-            Draw();
+            RenderPrintText(pixels, 10, 10, colors.red, "NO SCreen!");
         }
 
         glDrawPixels(width, heigth, GL_RGB, GL_UNSIGNED_BYTE, pixels);
@@ -115,6 +116,14 @@ void Window::DrawLine(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, const 
 
 void Window::DrawBox(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, const Pixel& color)
 {
+    DrawLine(x1, y1, x1, y2, color);
+    DrawLine(x1, y1, x2, y1, color);
+    DrawLine(x1, y2, x2, y2, color);
+    DrawLine(x2, y1, x2, y2, color);
+}
+
+void Window::DrawBoxFill(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, const Pixel& color)
+{
     if (x1 > x2)
     {
         std::swap(x1, x2);
@@ -130,11 +139,6 @@ void Window::DrawBox(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, const P
             pixels[y][x] = color;
         }
     }
-}
-
-void Window::DrawBox(uint16_t x, uint16_t y, const Pixel& color)
-{
-    DrawBox(x, y, x + 16, y + 16, color);
 }
 
 static double degToRad(const double d) { return (d * M_PI / 180); }
@@ -180,41 +184,9 @@ void Window::Fill(const uint16_t x, const uint16_t y, const Pixel& color)
     FillRecursive(x, y, pixels[y][x], color, 250);
 }
 
-void Window::PrintText(const uint16_t x, const uint16_t y, const std::string text)
+void Window::PrintText(const uint16_t x, const uint16_t y, const Pixel& color, const std::string text)
 {
-    RenderPrintText(pixels, x, y, colors.red, text);
-}
-
-void Window::DrawDropper(const uint16_t x, const uint16_t y, const uint16_t radius, const uint16_t deg, const bool left, const Pixel& color)
-{
-    DrawCircle(x, y, radius, 36 * 2, colors.orange);
-    DrawCircle(x, y, radius + 32, 36 * 2, colors.orange);
-
-    double         rad    = degToRad(left ? deg : deg + 180);
-    double         sine   = sin(rad);
-    double         cosine = cos(rad);
-    const uint16_t sx     = x + sine * radius;
-    const uint16_t sy     = y + cosine * radius;
-
-    DrawLine(x, y, sx, sy, color);
-
-    static const uint16_t space      = 25;
-    static const uint16_t turnOffset = 10;
-
-    for (int i = 0; i < 14; i++)
-    {
-        uint16_t deg2 = (i % 7) * space + turnOffset;
-        if (i > 6)
-        {
-            deg2 += 180;
-        }
-        rad    = degToRad(deg2);
-        sine   = sin(rad);
-        cosine = cos(rad);
-        //    DrawDropPoint(x + sine * (radius + 16), y + cosine * (radius + 16), i
-        //    + 1,
-        //                  color);
-    }
+    RenderPrintText(pixels, x, y, color, text);
 }
 
 void Window::DrawCircle(const uint16_t x, const uint16_t y, const uint16_t radius, const uint16_t numberOfSides, const Pixel& color, bool fill)
@@ -242,14 +214,6 @@ void Window::DrawCircle(const uint16_t x, const uint16_t y, const uint16_t radiu
     {
         Fill(x, y, color);
     }
-}
-
-void Window::Draw(void)
-{
-    Clear();
-
-    DrawDropper(width - 150, 150, 100, 100, true, colors.red);
-    RenderPrintText(pixels, 10, 10, colors.red, "NO SCreen!");
 }
 
 void Window::Open(void)

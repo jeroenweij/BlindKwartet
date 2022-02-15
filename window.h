@@ -18,16 +18,15 @@ class Window
 
     void DrawLine(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, const Pixel& color);
     void DrawBox(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, const Pixel& color);
-    void DrawBox(uint16_t x, uint16_t y, const Pixel& color);
+    void DrawBoxFill(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, const Pixel& color);
     void DrawCircle(const uint16_t x, const uint16_t y, const uint16_t radius, const uint16_t numberOfSides, const Pixel& color, bool fill = false);
     void Fill(const uint16_t x, const uint16_t y, const Pixel& color);
-    void PrintText(const uint16_t x, const uint16_t y, const std::string text);
+
+    void PrintText(const uint16_t x, const uint16_t y, const Pixel& color, const std::string text);
 
   private:
     void Thread();
-    void Draw();
     void FillRecursive(const uint16_t x, const uint16_t y, const Pixel oldColor, const Pixel& color, const uint16_t c);
-    void DrawDropper(const uint16_t x, const uint16_t y, const uint16_t radius, const uint16_t deg, const bool left, const Pixel& color);
 
     void Clear();
 

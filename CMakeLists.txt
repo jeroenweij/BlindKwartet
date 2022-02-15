@@ -21,6 +21,14 @@ add_executable(BlindKwartet
     drawable.h
     MainScreen.h
     MainScreen.cpp
+    Player.h
+    Player.cpp
+    CardBase.h
+    CardBase.cpp
+    Card.h
+    Card.cpp
+    Cards.h
+    Cards.cpp
     )
 
 find_package(OpenGL REQUIRED)
