@@ -3,6 +3,7 @@
 #include <vector>
 
 #include "Card.h"
+#include "Kwartet.h"
 #include "Player.h"
 
 class Cards

@@ -20,10 +20,12 @@ class CardBase
     void              SetName(std::string newName);
     const Status      GetStatus() const;
     const int         GetId() const;
-    void              Claim(const Player& claimPlayer);
+    void              Claim(const int claimPlayer);
     void              ClaimKwartet(const Player& claimPlayer);
     const bool        IsNamed() const;
-    const int         GetOwner() const;
+
+    const int GetOwner() const;
+    void      SetOwner(const int newOwner);
 
   protected:
     const int id;

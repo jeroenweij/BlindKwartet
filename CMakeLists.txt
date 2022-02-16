@@ -3,6 +3,9 @@ cmake_minimum_required(VERSION 3.10)
 # set the project name
 project(BlindKwartet)
 
+set(fontfile "font.hex")
+configure_file (${fontfile} ${fontfile} COPYONLY)
+
 # add the executable
 add_executable(BlindKwartet
     main.cpp
@@ -13,9 +16,8 @@ add_executable(BlindKwartet
     windowSize.h
     colors.h
     colors.cpp
-    textRender.h
-    textRender.cpp
-    characters.h
+    Font.h
+    Font.cpp
     Kwartetter.h
     Kwartetter.cpp
     drawable.h
@@ -29,6 +31,8 @@ add_executable(BlindKwartet
     Card.cpp
     Cards.h
     Cards.cpp
+    Kwartet.h
+    Kwartet.cpp
     )
 
 find_package(OpenGL REQUIRED)

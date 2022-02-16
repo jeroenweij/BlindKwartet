@@ -8,9 +8,9 @@ const int CardBase::GetId() const
     return id;
 }
 
-void CardBase::Claim(const Player& claimPlayer)
+void CardBase::Claim(const int claimPlayer)
 {
-    playerId = claimPlayer.GetId();
+    playerId = claimPlayer;
     status   = Status::CLAIMED;
 }
 
@@ -28,6 +28,11 @@ const bool CardBase::IsNamed() const
 const int CardBase::GetOwner() const
 {
     return playerId;
+}
+
+void CardBase::SetOwner(const int newOwner)
+{
+    playerId = newOwner;
 }
 
 CardBase::CardBase(const int id) :

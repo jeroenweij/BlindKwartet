@@ -27,7 +27,7 @@ bool Cards::CheckInit(const int numCards) const
         return false;
     }
 
-    for (const auto& kw : kwartets)
+    for (const Kwartet& kw : kwartets)
     {
         if (!kw.IsValid(cards))
         {

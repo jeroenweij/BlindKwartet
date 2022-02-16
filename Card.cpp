@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <iostream>
 #include <string>
 
@@ -15,21 +16,45 @@ const bool Card::InKwartet(const int kwId) const
     return kwId == kwartetId;
 }
 
-Kwartet::Kwartet(const int id) :
-    CardBase(id)
+void Card::NotOwnedBy(const int playerId)
 {
-}
-
-bool Kwartet::IsValid(const CardList& cardlist) const
-{
-    int cards = 0;
-
-    for (const CardPtr& card : cardlist)
+    if (GetOwner() == -1)
     {
-        if (card->InKwartet(id))
+        if (notOwnedBy.empty() || std::find(notOwnedBy.begin(), notOwnedBy.end(), playerId) == notOwnedBy.end())
         {
-            cards++;
+            notOwnedBy.push_back(playerId);
         }
     }
-    return cards == 4;
+}
+
+bool Card::Check(const PlayerList& players)
+{
+    if (GetOwner() == -1)
+    {
+        if (notOwnedBy.size() == players.size() - 1)
+        {
+            std::cout << "Card " << GetName() << "Is not owned by players: " << std::endl;
+            for (const int i : notOwnedBy)
+            {
+                std::cout << i << ", ";
+            }
+            std::cout << std::endl;
+
+            for (const Player& p : players)
+            {
+                if (std::find(notOwnedBy.begin(), notOwnedBy.end(), p.GetId()) == notOwnedBy.end())
+                {
+                    std::cout << "Check p " << p.Name() << " NOT FOUND: " << p.GetId() << std::endl;
+                    Claim(p.GetId());
+                    notOwnedBy.clear();
+                    return true;
+                }
+            }
+        }
+    }
+    else
+    {
+        notOwnedBy.clear();
+    }
+    return true;
 }

@@ -54,5 +54,5 @@ void Player::AddCard()
 void Player::ClaimCard(CardPtr card)
 {
     ClaimedCards(1);
-    card->Claim(*this);
+    card->Claim(GetId());
 }

@@ -4,7 +4,6 @@
 #include <stdarg.h>
 #include <thread>
 
-#include "textRender.h"
 #include "window.h"
 
 static MainColor colors;
@@ -41,7 +40,7 @@ void Window::Thread()
         }
         else
         {
-            RenderPrintText(pixels, 10, 10, colors.red, "NO SCreen!");
+            textRender.PrintText(pixels, 10, 10, colors.red, "NO SCreen!");
         }
 
         glDrawPixels(width, heigth, GL_RGB, GL_UNSIGNED_BYTE, pixels);
@@ -58,7 +57,8 @@ void Window::Thread()
 
 Window::Window() :
     thread(),
-    window(nullptr)
+    window(nullptr),
+    textRender()
 {
     Clear();
 }
@@ -186,7 +186,7 @@ void Window::Fill(const uint16_t x, const uint16_t y, const Pixel& color)
 
 void Window::PrintText(const uint16_t x, const uint16_t y, const Pixel& color, const std::string text)
 {
-    RenderPrintText(pixels, x, y, color, text);
+    textRender.PrintText(pixels, x, y, color, text);
 }
 
 void Window::DrawCircle(const uint16_t x, const uint16_t y, const uint16_t radius, const uint16_t numberOfSides, const Pixel& color, bool fill)

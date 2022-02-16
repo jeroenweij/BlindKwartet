@@ -32,14 +32,17 @@ class Kwartetter
     Player& GetNextPlayer();
 
     bool CheckPlayerHasCardInSeries(Player& pl, Kwartet& kw);
-    bool CheckPlayer2AnswerYes(Player& pl1, Player& pl2, const CardPtr card);
+    bool CheckPlayer2Answer(Player& pl1, Player& pl2, const CardPtr card, Kwartet& kw);
+    bool CheckNewKwartet(const Player& pl1, Kwartet& kw);
 
     bool GameIsRunning();
     bool GameComplete();
     void GameOver(std::string reason);
+    int  GetInt(const int max);
 
     PlayerList& players;
     Cards       cards;
     WindowStack windows;
     bool        stop;
+    bool        dontSelectNextPlayer;
 };

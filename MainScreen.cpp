@@ -93,6 +93,12 @@ void MainScreen::DrawKwartet(Window& window, int x, int y, const int w, const in
 
     std::stringstream ss;
     ss << kw.GetId() << ": " << kw.GetName();
+
+    if (kw.GetUnknownClaims() > 0)
+    {
+        ss << " (" << kw.GetUnknownClaims() << ")";
+    }
+
     window.PrintText(x + margin, y, ColorFromState(kw.GetStatus()), ss.str());
     y -= margin;
     x++;

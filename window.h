@@ -4,6 +4,7 @@
 #include <list>
 #include <thread>
 
+#include "Font.h"
 #include "colors.h"
 #include "drawable.h"
 #include "windowSize.h"
@@ -34,4 +35,5 @@ class Window
     std::thread               thread;
     GLFWwindow*               window;
     std::shared_ptr<Drawable> screen;
+    Font                      textRender;
 };

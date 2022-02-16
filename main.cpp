@@ -11,6 +11,7 @@ int main()
     int numPlayers = 0;
     int numCardsPP = 0;
     int numCards   = 0;
+
     cout << "Type number of players: ";
     cin >> numPlayers;
     cout << "the number of players is: " << numPlayers << std::endl;
