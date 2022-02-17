@@ -16,8 +16,9 @@ class Card : public CardBase
 {
   public:
     Card(const int id, const int kwartetId);
-    const bool InKwartet(const int kwId) const;
-    void       NotOwnedBy(const int playerId);
+    const bool            InKwartet(const int kwId) const;
+    void                  NotOwnedBy(const int playerId);
+    const std::list<int>& GetNotOwnedByPlayers() const;
 
     bool Check(const std::vector<Player>& players);
 

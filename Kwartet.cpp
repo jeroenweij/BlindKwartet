@@ -28,7 +28,7 @@ bool Kwartet::IsValid(const CardList& cardlist) const
 
     int unclaimedCards = CountUnclaimed(cardlist);
 
-    if (unclaimedCards < playersWithCard.size())
+    if (unclaimedCards < playersWithUnnamedCard.size())
     {
         return false;
     }
@@ -66,9 +66,9 @@ bool Kwartet::ClaimUnknownCard(const Player& pl, const CardList& cardlist)
     {
         return ClaimFirstUnclaimedCard(pl.GetId(), cardlist);
     }
-    if (playersWithCard.size() < unclaimedCards)
+    if (playersWithUnnamedCard.size() < unclaimedCards)
     {
-        playersWithCard.push_back(pl.GetId());
+        playersWithUnnamedCard.push_back(pl.GetId());
         return true;
     }
 
@@ -93,28 +93,44 @@ bool Kwartet::ClaimFirstUnclaimedCard(const int plId, const CardList& cardlist)
 
 const int Kwartet::GetUnknownClaims() const
 {
-    return playersWithCard.size();
+    return playersWithUnnamedCard.size();
+}
+
+const std::vector<int>& Kwartet::GetUnknownClaimPlayers() const
+{
+    return playersWithUnnamedCard;
 }
 
 const bool Kwartet::PlayerHasUnnamedCard(const int plId) const
 {
-    return std::find(playersWithCard.begin(), playersWithCard.end(), plId) != playersWithCard.end();
+    return std::find(playersWithUnnamedCard.begin(), playersWithUnnamedCard.end(), plId) != playersWithUnnamedCard.end();
 }
 
 void Kwartet::PlayerLostUnnamedCard(const int plId)
 {
-    playersWithCard.erase(std::find(playersWithCard.begin(), playersWithCard.end(), plId));
+    playersWithUnnamedCard.erase(std::find(playersWithUnnamedCard.begin(), playersWithUnnamedCard.end(), plId));
 }
 
-void Kwartet::Claim(const Player& pl, const CardList& cardlist)
+void Kwartet::Claim(Player& pl, const CardList& cardlist)
 {
     CardBase::ClaimKwartet(pl);
-    playersWithCard.clear();
     for (const CardPtr card : cardlist)
     {
         if (card->InKwartet(GetId()))
         {
+            if (card->GetStatus() == Status::UNCLAIMED)
+            {
+                if (PlayerHasUnnamedCard(pl.GetId())) // && !card->IsNamed())
+                {
+                    PlayerLostUnnamedCard(pl.GetId());
+                }
+                else
+                {
+                    pl.ClaimedCards(1);
+                }
+            }
             card->ClaimKwartet(pl);
         }
     }
+    playersWithUnnamedCard.clear();
 }

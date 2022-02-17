@@ -31,7 +31,7 @@ class Window
 
     void Clear();
 
-    Pixel                     pixels[heigth][width];
+    PixelList                 pixels;
     std::thread               thread;
     GLFWwindow*               window;
     std::shared_ptr<Drawable> screen;

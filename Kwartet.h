@@ -17,15 +17,17 @@ class Kwartet : public CardBase
 
     bool IsValid(const CardList& cardlist) const;
 
-    bool       ClaimUnknownCard(const Player& pl, const CardList& cardlist);
-    const int  GetUnknownClaims() const;
+    bool                    ClaimUnknownCard(const Player& pl, const CardList& cardlist);
+    const int               GetUnknownClaims() const;
+    const std::vector<int>& GetUnknownClaimPlayers() const;
+
     const bool PlayerHasUnnamedCard(const int plId) const;
     void       PlayerLostUnnamedCard(const int plId);
-    void       Claim(const Player& pl, const CardList& cardlist);
+    void       Claim(Player& pl, const CardList& cardlist);
 
   private:
     bool      ClaimFirstUnclaimedCard(const int plId, const CardList& cardlist);
     const int CountUnclaimed(const CardList& cardlist) const;
 
-    std::vector<int> playersWithCard;
+    std::vector<int> playersWithUnnamedCard;
 };

@@ -6,7 +6,8 @@
 #include "colors.h"
 #include "windowSize.h"
 
-static const unsigned int bitNum = 21;
+static const unsigned int bitNum = 20;
+
 struct Char
 {
     Char(const int ascii, const std::string hex);
@@ -18,6 +19,7 @@ struct Char
     void DetermineBitLength();
 };
 
+using CharMap = std::map<int, Char>;
 class Font
 {
   public:
@@ -25,8 +27,8 @@ class Font
 
     const bool Load();
 
-    void PrintText(Pixel pixels[heigth][width], uint16_t x, const uint16_t y, const Pixel& color, const std::string text);
+    void PrintText(PixelList pixels, uint16_t x, const uint16_t y, const Pixel& color, const std::string text);
 
   private:
-    std::map<int, Char> charMap;
+    CharMap charMap;
 };

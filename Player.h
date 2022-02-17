@@ -18,7 +18,6 @@ class Player
 
     const int CardsInHand() const;
     const int CardsUnclaimed() const;
-    const int Kwartets() const;
     void      ClaimedCards(const int numCards);
     void      LostCard();
     void      AddCard();

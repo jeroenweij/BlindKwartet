@@ -39,22 +39,10 @@ const bool Font::Load()
         return false;
     }
 
-    const auto mappedChar = charMap.find(' ');
-
-    if (mappedChar != charMap.end())
-    {
-        Char ch = mappedChar->second;
-        std::cout << " ch.bitLength " << ch.bitLength << std::endl;
-        for (int i = 0; i < 21; i++)
-        {
-            std::cout << std::hex << ch.bits[i] << " ";
-        }
-        std::cout << std::endl;
-    }
     return true;
 }
 
-void Font::PrintText(Pixel pixels[heigth][width], uint16_t x, const uint16_t y, const Pixel& color, const std::string text)
+void Font::PrintText(PixelList pixels, uint16_t x, const uint16_t y, const Pixel& color, const std::string text)
 {
     for (const char c : text)
     {
@@ -65,14 +53,14 @@ void Font::PrintText(Pixel pixels[heigth][width], uint16_t x, const uint16_t y, 
             {
                 Char     ch = mappedChar->second;
                 uint32_t y2 = y;
-                for (int i = 20; i >= 0; i--)
+                for (int i = bitNum - 1; i >= 0; i--)
                 {
                     const uint32_t d = ch.bits[i];
-                    for (uint32_t x2 = 0; x2 < ch.bitLength; x2++)
+                    for (uint32_t x2 = 0; x2 < ch.bitLength - ch.startBit + 1; x2++)
                     {
                         if (d & 0x01 << (ch.bitLength - x2))
                         {
-                            if (y2 < heigth && x + x2 < width)
+                            if (y2 < windowHeigth && x + x2 < windowWidth)
                             {
                                 pixels[y2][x + x2] = color;
                             }
@@ -80,7 +68,7 @@ void Font::PrintText(Pixel pixels[heigth][width], uint16_t x, const uint16_t y, 
                     }
                     y2++;
                 }
-                x += ch.bitLength;
+                x += ch.bitLength - ch.startBit + 3;
             }
         }
     }
@@ -88,7 +76,7 @@ void Font::PrintText(Pixel pixels[heigth][width], uint16_t x, const uint16_t y, 
 
 Char::Char(const int asci, const std::string hex)
 {
-    int numInts    = 21;
+    int numInts    = bitNum;
     int wordLength = hex.length() / numInts;
     int bitsUsed   = 0;
 
@@ -102,6 +90,7 @@ Char::Char(const int asci, const std::string hex)
     if (asci == ' ')
     {
         bitLength = 8;
+        startBit  = 0;
     }
     else
     {
@@ -116,7 +105,7 @@ void Char::DetermineBitLength()
 
     for (uint32_t word : bits)
     {
-        for (int i = bitLength; i < 32; i++)
+        for (int i = 0; i < 32; i++)
         {
             uint32_t mask = 0x01 << i;
             if (word & mask)

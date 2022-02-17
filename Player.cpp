@@ -30,11 +30,6 @@ const int Player::CardsUnclaimed() const
     return unclaimedCards;
 }
 
-const int Player::Kwartets() const
-{
-    return 0;
-}
-
 void Player::ClaimedCards(const int numCards)
 {
     unclaimedCards -= numCards;

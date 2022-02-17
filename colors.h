@@ -1,6 +1,8 @@
 #include <GL/gl.h>
 #include <iostream>
 
+#include "windowSize.h"
+
 #pragma once
 
 struct Pixel
@@ -12,6 +14,8 @@ struct Pixel
     GLubyte g;
     GLubyte b;
 };
+
+using PixelList = Pixel[windowHeigth][windowWidth];
 
 bool operator==(const Pixel& lhs, const Pixel& rhs);
 
@@ -27,4 +31,5 @@ class MainColor
     const Pixel green;
     const Pixel blue;
     const Pixel orange;
+    const Pixel yellow;
 };

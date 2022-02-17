@@ -31,6 +31,7 @@ void Kwartetter::Start()
     while (GameIsRunning())
     {
         Player& pl = GetNextPlayer();
+        std::cout << "Speler " << pl.Name() << " is aan zet" << std::endl;
         // check if quartet
         Player&  pl2  = AskUser("Aan wie word een kaart gevraagd");
         Kwartet& kw   = AskKwartet();
@@ -80,8 +81,18 @@ bool Kwartetter::CheckPlayer2Answer(Player& pl1, Player& pl2, const CardPtr card
     }
     else
     {
-        card->NotOwnedBy(pl2.GetId());
-        card->NotOwnedBy(pl1.GetId());
+        if (card->GetOwner() == pl2.GetId())
+        {
+            std::stringstream ss;
+            ss << "Speler " << pl2.Name() << " had de kaart " << card->GetName() << "wel!" << std::endl;
+            GameOver(ss.str());
+            return false;
+        }
+        else
+        {
+            card->NotOwnedBy(pl2.GetId());
+            card->NotOwnedBy(pl1.GetId());
+        }
         return true;
     }
 
@@ -89,9 +100,18 @@ bool Kwartetter::CheckPlayer2Answer(Player& pl1, Player& pl2, const CardPtr card
     return false;
 }
 
-bool Kwartetter::CheckNewKwartet(const Player& pl1, Kwartet& kw)
+bool Kwartetter::CheckNewKwartet(Player& pl1, Kwartet& kw)
 {
     int playerclaimed = 0;
+
+    for (const int plId : kw.GetUnknownClaimPlayers())
+    {
+        if (plId != pl1.GetId())
+        {
+            std::cout << "player " << pl1.Name() << " Kan onmogelijk het kwartet " << kw.GetName() << " heben" << std::endl;
+            return true;
+        }
+    }
 
     for (const CardPtr card : cards.GetCards())
     {
@@ -116,7 +136,15 @@ bool Kwartetter::CheckNewKwartet(const Player& pl1, Kwartet& kw)
         return true;
     }
 
+    int missing = 4 - playerclaimed - (kw.PlayerHasUnnamedCard(pl1.GetId()) ? 1 : 0);
+    if (pl1.CardsUnclaimed() < missing)
+    {
+        std::cout << "player " << pl1.Name() << " heeft niet genoeg vrije kaarten om het kwartet " << kw.GetName() << " te heben" << std::endl;
+        return true;
+    }
+
     std::stringstream ss;
+
     ss << "Heeft " << pl1.Name() << " het kwartet " << kw.GetName() << " compleet?";
     if (Ask(ss.str()))
     {
@@ -226,7 +254,7 @@ int Kwartetter::GetInt(const int max)
     std::string ans;
     int         i = -100;
 
-    while (i < -1 || i > max)
+    while (i < 0 || i > max)
     {
         try
         {
@@ -246,13 +274,13 @@ Player& Kwartetter::AskUser(std::string question)
     std::cout << question << ":" << std::endl;
     for (const Player& pl : players)
     {
-        std::cout << pl.GetId() << ": " << pl.Name() << std::endl;
+        std::cout << pl.GetId() + 1 << ": " << pl.Name() << std::endl;
     }
-    int ans = GetInt(players.size() - 1);
+    int ans = GetInt(players.size());
 
-    if (ans < players.size())
+    if (ans <= players.size() && ans > 0)
     {
-        return players.at(ans);
+        return players.at(ans - 1);
     }
     return players.back();
 }
@@ -296,17 +324,17 @@ bool Kwartetter::HasAnywoneKwartet()
 Kwartet& Kwartetter::AskKwartet()
 {
     std::cout << "Uit welke serie word er gevraagd:" << std::endl;
-    std::cout << "-1: Nieuwe serie" << std::endl;
+    std::cout << "0: Nieuwe serie" << std::endl;
     for (const Kwartet& kw : cards.GetKwartets())
     {
         if (kw.IsNamed())
         {
-            std::cout << kw.GetId() << ": " << kw.GetName() << std::endl;
+            std::cout << (kw.GetId() + 1) << ": " << kw.GetName() << std::endl;
         }
     }
-    int ans = GetInt(cards.GetKwartets().size() - 1);
+    int ans = GetInt(cards.GetKwartets().size());
 
-    if (ans == -1)
+    if (ans == 0)
     {
         // find and use new kwartet
         Kwartet* kwptr = UnNamedKwartetGet();
@@ -320,9 +348,9 @@ Kwartet& Kwartetter::AskKwartet()
         return *kwptr;
     }
 
-    if (ans < cards.GetKwartets().size())
+    if (ans <= cards.GetKwartets().size())
     {
-        Kwartet& kw = cards.GetKwartetsMutable().at(ans);
+        Kwartet& kw = cards.GetKwartetsMutable().at(ans - 1);
         if (!kw.IsNamed())
         {
             kw.SetName(AskString("Hoe heet deze serie: "));
@@ -335,18 +363,29 @@ Kwartet& Kwartetter::AskKwartet()
 CardPtr Kwartetter::AskKwartetCard(const int kwId)
 {
     std::cout << "Welke kaart word er gevraagd:" << std::endl;
-    std::cout << "-1: Nieuwe kaart" << std::endl;
+    std::cout << "0: Nieuwe kaart" << std::endl;
+
+    int offset = -1;
+    int count  = 1;
 
     for (const CardPtr card : cards.GetCards())
     {
-        if (card->IsNamed() && card->InKwartet(kwId))
+        if (card->InKwartet(kwId))
         {
-            std::cout << card->GetId() << ": " << card->GetName() << std::endl;
+            if (offset < 0)
+            {
+                offset = card->GetId();
+            }
+            if (card->IsNamed())
+            {
+                std::cout << count << ": " << card->GetName() << std::endl;
+            }
+            count++;
         }
     }
-    int ans = GetInt(cards.GetCards().size() - 1);
+    int ans = GetInt(4);
 
-    if (ans == -1)
+    if (ans == 0)
     {
         // find and use new card
         CardPtr card = UnNamedCardGet(kwId);
@@ -362,7 +401,7 @@ CardPtr Kwartetter::AskKwartetCard(const int kwId)
 
     if (ans < cards.GetCards().size())
     {
-        CardPtr card = cards.GetCards().at(ans);
+        CardPtr card = cards.GetCards().at(offset + ans - 1);
         if (!card->IsNamed())
         {
             card->SetName(AskString("Hoe heet deze kaart: "));
@@ -436,12 +475,6 @@ bool Kwartetter::GameComplete()
 
 bool Kwartetter::GameIsRunning()
 {
-    if (GameComplete())
-    {
-        std::cout << "GAME COMPLETE" << std::endl;
-        return false;
-    }
-
     int count = 0;
 
     for (const Player& p : players)
@@ -451,6 +484,22 @@ bool Kwartetter::GameIsRunning()
         {
             std::stringstream ss;
             ss << "Speler " << p.Name() << " heeft meer onbekende kaarten dan kaarten";
+            GameOver(ss.str());
+            return false;
+        }
+
+        if (p.CardsInHand() < 0)
+        {
+            std::stringstream ss;
+            ss << "Speler " << p.Name() << " heeft een negatief aantal kaarten";
+            GameOver(ss.str());
+            return false;
+        }
+
+        if (p.CardsUnclaimed() < 0)
+        {
+            std::stringstream ss;
+            ss << "Speler " << p.Name() << " heeft een negatief aantal onbekende kaarten";
             GameOver(ss.str());
             return false;
         }
@@ -466,7 +515,9 @@ bool Kwartetter::GameIsRunning()
     {
         if (!card->Check(players))
         {
-            GameOver("Invalid card state");
+            std::stringstream ss;
+            ss << "Kaart " << card->GetName() << " is in een invalide staat";
+            GameOver(ss.str());
             return false;
         }
     }
@@ -475,15 +526,31 @@ bool Kwartetter::GameIsRunning()
     {
         if (!kw.IsValid(cards.GetCards()))
         {
+            std::stringstream ss;
+            ss << "Kwarted " << kw.GetName() << " is in een ongeldige staat";
+            GameOver(ss.str());
             return false;
         }
     }
+
+    if (GameComplete())
+    {
+        std::cout << "GAME COMPLETE" << std::endl;
+        return false;
+    }
+
     return !stop;
 }
 
 void Kwartetter::GameOver(std::string reason)
 {
-    std::cout << "GAME OVER" << std::endl;
+    std::cout << "░██████╗░░█████╗░███╗░░░███╗███████╗  ░█████╗░██╗░░░██╗███████╗██████╗░" << std::endl;
+    std::cout << "██╔════╝░██╔══██╗████╗░████║██╔════╝  ██╔══██╗██║░░░██║██╔════╝██╔══██╗" << std::endl;
+    std::cout << "██║░░██╗░███████║██╔████╔██║█████╗░░  ██║░░██║╚██╗░██╔╝█████╗░░██████╔╝" << std::endl;
+    std::cout << "██║░░╚██╗██╔══██║██║╚██╔╝██║██╔══╝░░  ██║░░██║░╚████╔╝░██╔══╝░░██╔══██╗" << std::endl;
+    std::cout << "╚██████╔╝██║░░██║██║░╚═╝░██║███████╗  ╚█████╔╝░░╚██╔╝░░███████╗██║░░██║" << std::endl;
+    std::cout << "░╚═════╝░╚═╝░░╚═╝╚═╝░░░░░╚═╝╚══════╝  ░╚════╝░░░░╚═╝░░░╚══════╝╚═╝░░╚═╝" << std::endl;
+
     std::cout << reason << std::endl;
     stop = true;
 }

@@ -1,4 +1,4 @@
 #pragma once
 
-static const int width  = 1280;
-static const int heigth = 600;
+static const int windowWidth  = 1400;
+static const int windowHeigth = 800;

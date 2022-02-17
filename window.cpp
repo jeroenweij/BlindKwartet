@@ -17,7 +17,7 @@ void Window::Thread()
     }
 
     /* Create a windowed mode window and its OpenGL context */
-    window = glfwCreateWindow(width, heigth, "Blind kwartetter", NULL, NULL);
+    window = glfwCreateWindow(windowWidth, windowHeigth, "Blind kwartetter", NULL, NULL);
     if (!window)
     {
         glfwTerminate();
@@ -43,7 +43,7 @@ void Window::Thread()
             textRender.PrintText(pixels, 10, 10, colors.red, "NO SCreen!");
         }
 
-        glDrawPixels(width, heigth, GL_RGB, GL_UNSIGNED_BYTE, pixels);
+        glDrawPixels(windowWidth, windowHeigth, GL_RGB, GL_UNSIGNED_BYTE, pixels);
 
         /* Swap front and back buffers */
         glfwSwapBuffers(window);
@@ -65,9 +65,9 @@ Window::Window() :
 
 void Window::Clear()
 {
-    for (int w = 0; w < width; w++)
+    for (int w = 0; w < windowWidth; w++)
     {
-        for (int h = 0; h < heigth; h++)
+        for (int h = 0; h < windowHeigth; h++)
         {
             pixels[h][w] = {255, 255, 255};
         }
@@ -163,10 +163,10 @@ void Window::FillRecursive(const uint16_t x, const uint16_t y, const Pixel oldCo
         }
 
         sx = x + 1;
-        while (x < width && pixels[y][sx] == oldColor)
+        while (x < windowWidth && pixels[y][sx] == oldColor)
         {
             pixels[y][sx] = color;
-            if (y < heigth - 1)
+            if (y < windowHeigth - 1)
             {
                 FillRecursive(x, y + 1, oldColor, color, c - 1);
             }
