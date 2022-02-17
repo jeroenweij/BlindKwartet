@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Cards.h"
+#include "InputInterface.h"
 #include "Player.h"
 #include "windowStack.h"
 
@@ -10,7 +11,7 @@
 class Kwartetter
 {
   public:
-    Kwartetter(PlayerList& players, const int numCards);
+    Kwartetter(InputInterface& input, PlayerList& players, const int numCards);
     ~Kwartetter();
 
     bool CheckInit(const int numCards) const;
@@ -38,11 +39,11 @@ class Kwartetter
     bool GameIsRunning();
     bool GameComplete();
     void GameOver(std::string reason);
-    int  GetInt(const int max);
 
-    PlayerList& players;
-    Cards       cards;
-    WindowStack windows;
-    bool        stop;
-    bool        dontSelectNextPlayer;
+    InputInterface& input;
+    PlayerList&     players;
+    Cards           cards;
+    WindowStack     windows;
+    bool            stop;
+    bool            dontSelectNextPlayer;
 };

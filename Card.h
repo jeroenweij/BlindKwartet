@@ -20,7 +20,7 @@ class Card : public CardBase
     void                  NotOwnedBy(const int playerId);
     const std::list<int>& GetNotOwnedByPlayers() const;
 
-    bool Check(const std::vector<Player>& players);
+    bool Check(std::vector<Player>& players);
 
   private:
     const int      kwartetId;

@@ -1,6 +1,7 @@
 #include <iostream>
 #include <list>
 
+#include "Input.h"
 #include "Kwartetter.h"
 #include "Player.h"
 
@@ -35,7 +36,8 @@ int main()
                 players.push_back({name, numCardsPP});
             }
 
-            Kwartetter kw(players, numCards);
+            Input      input;
+            Kwartetter kw(input, players, numCards);
             if (!kw.CheckInit(numCards))
             {
                 cout << "Init FAILED" << std::endl;

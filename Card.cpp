@@ -32,17 +32,18 @@ const std::list<int>& Card::GetNotOwnedByPlayers() const
     return notOwnedBy;
 }
 
-bool Card::Check(const PlayerList& players)
+bool Card::Check(PlayerList& players)
 {
     if (GetOwner() == -1)
     {
         if (notOwnedBy.size() == players.size() - 1)
         {
-            for (const Player& p : players)
+            for (Player& p : players)
             {
                 if (std::find(notOwnedBy.begin(), notOwnedBy.end(), p.GetId()) == notOwnedBy.end())
                 {
                     Claim(p.GetId());
+                    p.ClaimedCards(1);
                     notOwnedBy.clear();
                     return true;
                 }

@@ -4,7 +4,8 @@
 #include "Kwartetter.h"
 #include "MainScreen.h"
 
-Kwartetter::Kwartetter(PlayerList& players, const int numCards) :
+Kwartetter::Kwartetter(InputInterface& input, PlayerList& players, const int numCards) :
+    input(input),
     players(players),
     cards(numCards, players),
     stop(false),
@@ -51,7 +52,7 @@ bool Kwartetter::CheckPlayer2Answer(Player& pl1, Player& pl2, const CardPtr card
 {
     std::stringstream ss;
 
-    ss << "Had speler " << pl2.Name() << " de kaart: " << card->GetName();
+    ss << "Had speler " << pl2.Name() << " de kaart: " << kw.GetName() << " : " << card->GetName();
     if (Ask(ss.str()))
     {
         if (card->GetOwner() != pl2.GetId())
@@ -230,12 +231,10 @@ Player& Kwartetter::GetNextPlayer()
 
 bool Kwartetter::Ask(std::string question)
 {
-    std::string ans;
-
     std::cout << question << " [y/n]";
-    std::cin >> ans;
-    char c = std::tolower(ans.c_str()[0]);
+    std::string ans = input.GetString();
 
+    char c = std::tolower(ans.c_str()[0]);
     return (c == 'y' || c == 'j');
 }
 
@@ -244,29 +243,7 @@ std::string Kwartetter::AskString(std::string question)
     std::string ans;
 
     std::cout << question;
-    std::cin >> ans;
-
-    return ans;
-}
-
-int Kwartetter::GetInt(const int max)
-{
-    std::string ans;
-    int         i = -100;
-
-    while (i < 0 || i > max)
-    {
-        try
-        {
-            std::cin >> ans;
-            i = std::stoi(ans);
-        }
-        catch (const std::exception& e)
-        {
-            std::cout << "Exception " << e.what() << std::endl;
-        }
-    }
-    return i;
+    return input.GetString();
 }
 
 Player& Kwartetter::AskUser(std::string question)
@@ -276,7 +253,7 @@ Player& Kwartetter::AskUser(std::string question)
     {
         std::cout << pl.GetId() + 1 << ": " << pl.Name() << std::endl;
     }
-    int ans = GetInt(players.size());
+    int ans = input.GetInt(players.size());
 
     if (ans <= players.size() && ans > 0)
     {
@@ -332,7 +309,7 @@ Kwartet& Kwartetter::AskKwartet()
             std::cout << (kw.GetId() + 1) << ": " << kw.GetName() << std::endl;
         }
     }
-    int ans = GetInt(cards.GetKwartets().size());
+    int ans = input.GetInt(cards.GetKwartets().size());
 
     if (ans == 0)
     {
@@ -383,7 +360,7 @@ CardPtr Kwartetter::AskKwartetCard(const int kwId)
             count++;
         }
     }
-    int ans = GetInt(4);
+    int ans = input.GetInt(4);
 
     if (ans == 0)
     {
@@ -536,6 +513,12 @@ bool Kwartetter::GameIsRunning()
     if (GameComplete())
     {
         std::cout << "GAME COMPLETE" << std::endl;
+        return false;
+    }
+
+    if (!input.CheckState(players, cards))
+    {
+        GameOver("Invallid state");
         return false;
     }
 

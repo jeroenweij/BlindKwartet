@@ -120,12 +120,13 @@ void Kwartet::Claim(Player& pl, const CardList& cardlist)
         {
             if (card->GetStatus() == Status::UNCLAIMED)
             {
-                if (PlayerHasUnnamedCard(pl.GetId())) // && !card->IsNamed())
+                if (PlayerHasUnnamedCard(pl.GetId()) && !card->IsNamed())
                 {
                     PlayerLostUnnamedCard(pl.GetId());
                 }
                 else
                 {
+                    std::cout << "Claim 1" << std::endl;
                     pl.ClaimedCards(1);
                 }
             }
