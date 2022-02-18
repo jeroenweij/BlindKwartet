@@ -57,8 +57,8 @@ int main()
     // p3 -> p4
     input.TestInputPush("y");
     input.PushQuestion(4, A, 4, true, "4", "A");
-    input.PushState({{5, 3, 5, 3}, {3, 2, 3, 3}, {0, 0, 0, 0}});
     input.TestInputPush("n");
+    input.PushState({{5, 3, 5, 3}, {3, 2, 3, 3}, {0, 0, 0, 0}});
 
     // p3 -> p2
     input.TestInputPush("y");

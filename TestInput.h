@@ -12,6 +12,27 @@ struct TestState
     int kwartetCount[4];
 };
 
+enum class QType
+{
+    INT,
+    STRING,
+    STATE
+};
+
+struct QItem
+{
+  public:
+    QItem(int i);
+    QItem(std::string string);
+    QItem(TestState& state);
+
+    int         integer;
+    std::string string;
+    TestState   state;
+
+    QType type;
+};
+
 class TestInput : public InputInterface
 {
   public:
@@ -30,7 +51,5 @@ class TestInput : public InputInterface
     bool      CheckState(const PlayerList& players, const Cards& cards);
     const int GetKwartetCount(const Cards& cards, const int plId);
 
-    std::queue<int>         intQ;
-    std::queue<std::string> stringQ;
-    std::queue<TestState>   stateQ;
+    std::queue<QItem> itemQ;
 };
