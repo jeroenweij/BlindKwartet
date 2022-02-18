@@ -58,12 +58,13 @@ void MainScreen::Draw(Window& window)
     }
 
     // draw kwartets
-    x                  = 0;
+    x                  = margin / 2;
     int       y        = windowHeigth - barheigth - margin;
     int       kwWidth  = 400;
     const int kwHeigth = (players.size() + 1) * (textheigth + margin * 2);
     const int kwPerRow = windowWidth / (kwWidth + 1);
     int       kwWidtha = windowWidth / kwPerRow - 1;
+    kwWidth            = kwWidtha - margin;
 
     int columnCount = 0;
 
@@ -80,7 +81,7 @@ void MainScreen::Draw(Window& window)
         {
             columnCount = 0;
             y -= kwHeigth + 1 + margin;
-            x = 0;
+            x = margin / 2;
         }
     }
 }
@@ -168,11 +169,9 @@ void MainScreen::DrawKwartet(Window& window, int x, int y, const int w, const in
 void MainScreen::DrawCard(Window& window, const int x, int y, const int w, const int h, const Pixel& color, const CardPtr card, const int cardId, const int possiblePlId)
 {
     window.DrawBox(x, y, x + w, y - h, color);
-    std::stringstream ss;
 
-    ss << cardId << ": " << card->GetName();
     y -= margin + textheigth;
-    window.PrintText(x + margin, y, color, ss.str());
+    window.PrintText(x + margin, y, color, card->GetName());
 
     y -= margin + textheigth;
     if (card->GetStatus() == Status::UNCLAIMED)
@@ -181,7 +180,9 @@ void MainScreen::DrawCard(Window& window, const int x, int y, const int w, const
         {
             for (int plId : card->GetNotOwnedByPlayers())
             {
-                window.PrintText(x + margin, y, c.orange, PlayerFromId(plId).Name());
+                std::stringstream ss;
+                ss << "! " << PlayerFromId(plId).Name();
+                window.PrintText(x + margin, y, c.red, ss.str());
                 y -= margin + textheigth;
             }
         }
