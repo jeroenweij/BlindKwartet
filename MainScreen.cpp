@@ -17,20 +17,6 @@ MainScreen::MainScreen(const PlayerList& players, const Cards& cards) :
 {
 }
 
-const int MainScreen::GetKwartetCount(const int plId)
-{
-    int count = 0;
-
-    for (const Kwartet& kw : cards.GetKwartets())
-    {
-        if (kw.GetOwner() == plId)
-        {
-            count++;
-        }
-    }
-    return count;
-}
-
 void MainScreen::Draw(Window& window)
 {
     int       numPlayers = players.size();
@@ -48,7 +34,7 @@ void MainScreen::Draw(Window& window)
         window.PrintText(x + margin, texty, c.black, player.Name());
 
         texty -= textheigth + margin;
-        int kwartets    = GetKwartetCount(player.GetId());
+        int kwartets    = player.GetKwartetCount(cards.GetKwartets());
         int cardsInHand = player.CardsInHand() - (kwartets * 4);
 
         std::stringstream ss;

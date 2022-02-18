@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Card.h"
+#include "Kwartet.h"
 
 #include <string>
 #include <vector>
@@ -22,6 +23,7 @@ class Player
     void      LostCard();
     void      AddCard();
     void      ClaimCard(CardPtr card);
+    const int GetKwartetCount(const KwartetList& kwartets) const;
 
   private:
     const int         id;

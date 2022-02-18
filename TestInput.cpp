@@ -49,6 +49,14 @@ std::string TestInput::GetString()
     return "n";
 }
 
+void TestInput::Finish()
+{
+    if (!itemQ.empty())
+    {
+        throw std::invalid_argument("itemQ is NOT empty at end of program");
+    }
+}
+
 bool TestInput::assert(bool condition, std::string error)
 {
     if (!condition)
@@ -71,6 +79,7 @@ bool TestInput::assertInt(const int i1, const int i2, std::string error)
 
 bool TestInput::CheckState(const PlayerList& players, const Cards& cards)
 {
+    bool result = false;
     if (!itemQ.empty())
     {
         QItem qItem = itemQ.front();
@@ -79,77 +88,60 @@ bool TestInput::CheckState(const PlayerList& players, const Cards& cards)
         {
             TestState& state = qItem.state;
 
-            bool result = true;
+            result = true;
 
             for (int i = 0; i < 4; i++)
             {
                 result &= assertInt(players.at(i).CardsInHand(), state.cardCount[i] + state.kwartetCount[i] * 4, "Player incorrect cardcount");
                 result &= assertInt(players.at(i).CardsUnclaimed(), state.unknownCardCount[i], "Player incorrect unknown cardcount");
-                result &= assertInt(GetKwartetCount(cards, i), state.kwartetCount[i], "Player incorrect kwartet count");
+                result &= assertInt(players.at(i).GetKwartetCount(cards.GetKwartets()), state.kwartetCount[i], "Player incorrect kwartet count");
             }
-
-            return result;
         }
         else
         {
             std::cout << "Qitem is not a state" << std::endl;
-            while (true)
-            {
-            }
-            return false;
+            result = false;
         }
     }
-    std::cout << "itemQ is empty" << std::flush;
-    while (true)
+    else
     {
+        std::cout << "itemQ is empty" << std::endl;
     }
-    return false;
+
+    std::cout << "enter to continue" << std::endl;
+    std::cin.ignore();
+    return result;
 }
 
-void TestInput::TestInputPush(std::string string)
+void TestInput::Push(std::string string)
 {
-    std::cout << "Pushing " << string << std::endl;
     itemQ.push({string});
 }
 
-void TestInput::TestInputPush(int i)
+void TestInput::Push(int i)
 {
     itemQ.push({i});
 }
 
-void TestInput::PushState(TestState i)
+void TestInput::Push(TestState i)
 {
     itemQ.push({i});
 }
 
 void TestInput::PushQuestion(const int to, const int serie, const int card, bool hasCard, const std::string cardName, const std::string serieName)
 {
-    TestInputPush(to);
-    TestInputPush(serie);
+    Push(to);
+    Push(serie);
     if (!serieName.empty())
     {
-        TestInputPush(serieName);
+        Push(serieName);
     }
-    TestInputPush(card);
+    Push(card);
     if (!cardName.empty())
     {
-        TestInputPush(cardName);
+        Push(cardName);
     }
-    TestInputPush(hasCard ? "y" : "n");
-}
-
-const int TestInput::GetKwartetCount(const Cards& cards, const int plId)
-{
-    int count = 0;
-
-    for (const Kwartet& kw : cards.GetKwartets())
-    {
-        if (kw.GetOwner() == plId)
-        {
-            count++;
-        }
-    }
-    return count;
+    Push(hasCard ? "y" : "n");
 }
 
 QItem::QItem(int i) :

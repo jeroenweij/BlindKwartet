@@ -18,7 +18,7 @@ Kwartetter::~Kwartetter()
 {
 }
 
-bool Kwartetter::CheckInit(const int numCards) const
+bool Kwartetter::CheckInit(const int numCards)
 {
     return cards.CheckInit(numCards);
 }
@@ -32,7 +32,7 @@ void Kwartetter::Start()
     while (GameIsRunning())
     {
         Player& pl = GetNextPlayer();
-        std::cout << "Speler " << pl.Name() << " is aan zet" << std::endl;
+        std::cout << "\n\nSpeler " << pl.Name() << " is aan zet" << std::endl;
         // check if quartet
         Player&  pl2  = AskUser("Aan wie word een kaart gevraagd");
         Kwartet& kw   = AskKwartet();
@@ -46,6 +46,12 @@ void Kwartetter::Start()
             break;
         }
     }
+
+    if (!input.CheckState(players, cards))
+    {
+        std::cout << "Game finished in invalid state" << std::endl;
+    }
+    input.Finish();
 }
 
 bool Kwartetter::CheckPlayer2Answer(Player& pl1, Player& pl2, const CardPtr card, Kwartet& kw)
@@ -490,7 +496,7 @@ bool Kwartetter::GameIsRunning()
 
     for (const CardPtr card : cards.GetCards())
     {
-        if (!card->Check(players))
+        if (!card->Check(players, cards.GetKwartetsMutable()))
         {
             std::stringstream ss;
             ss << "Kaart " << card->GetName() << " is in een invalide staat";
@@ -499,7 +505,7 @@ bool Kwartetter::GameIsRunning()
         }
     }
 
-    for (const Kwartet& kw : cards.GetKwartets())
+    for (Kwartet& kw : cards.GetKwartetsMutable())
     {
         if (!kw.IsValid(cards.GetCards()))
         {

@@ -18,7 +18,6 @@ class MainScreen : public Drawable
     void          DrawCard(Window& window, const int x, int y, const int w, const int h, const Pixel& color, const CardPtr card, const int cardId, const int possiblePlId);
     const Pixel&  ColorFromState(Status state);
     const Player& PlayerFromId(const int plId) const;
-    const int     GetKwartetCount(const int plId);
 
     const PlayerList& players;
     const Cards&      cards;

@@ -14,7 +14,7 @@ class Kwartetter
     Kwartetter(InputInterface& input, PlayerList& players, const int numCards);
     ~Kwartetter();
 
-    bool CheckInit(const int numCards) const;
+    bool CheckInit(const int numCards);
     void Start();
 
   private:

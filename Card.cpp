@@ -32,7 +32,7 @@ const std::list<int>& Card::GetNotOwnedByPlayers() const
     return notOwnedBy;
 }
 
-bool Card::Check(PlayerList& players)
+bool Card::Check(PlayerList& players, KwartetList& kwartets)
 {
     if (GetOwner() == -1)
     {
@@ -42,6 +42,17 @@ bool Card::Check(PlayerList& players)
             {
                 if (std::find(notOwnedBy.begin(), notOwnedBy.end(), p.GetId()) == notOwnedBy.end())
                 {
+                    for (Kwartet& kw : kwartets)
+                    {
+                        if (kw.GetId() == kwartetId)
+                        {
+                            if (kw.PlayerHasUnnamedCard(p.GetId()))
+                            {
+                                kw.PlayerLostUnnamedCard(p.GetId());
+                            }
+                            break;
+                        }
+                    }
                     Claim(p.GetId());
                     p.ClaimedCards(1);
                     notOwnedBy.clear();

@@ -12,4 +12,5 @@ class InputInterface
     virtual std::string GetString()           = 0;
 
     virtual bool CheckState(const PlayerList& players, const Cards& cards) = 0;
+    virtual void Finish()                                                  = 0;
 };

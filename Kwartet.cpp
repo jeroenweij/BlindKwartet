@@ -10,7 +10,7 @@ Kwartet::Kwartet(const int id) :
 {
 }
 
-bool Kwartet::IsValid(const CardList& cardlist) const
+bool Kwartet::IsValid(const CardList& cardlist)
 {
     int cards = 0;
 
@@ -31,6 +31,19 @@ bool Kwartet::IsValid(const CardList& cardlist) const
     if (unclaimedCards < playersWithUnnamedCard.size())
     {
         return false;
+    }
+
+    if (unclaimedCards == 1 && playersWithUnnamedCard.size() == 1)
+    {
+        for (const CardPtr& card : cardlist)
+        {
+            if (card->InKwartet(id) && card->GetStatus() == Status::UNCLAIMED)
+            {
+                card->Claim(playersWithUnnamedCard.front());
+                playersWithUnnamedCard.clear();
+                break;
+            }
+        }
     }
 
     return true;
@@ -126,7 +139,6 @@ void Kwartet::Claim(Player& pl, const CardList& cardlist)
                 }
                 else
                 {
-                    std::cout << "Claim 1" << std::endl;
                     pl.ClaimedCards(1);
                 }
             }

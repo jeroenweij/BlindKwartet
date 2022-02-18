@@ -15,7 +15,7 @@ class Kwartet : public CardBase
   public:
     Kwartet(const int id);
 
-    bool IsValid(const CardList& cardlist) const;
+    bool IsValid(const CardList& cardlist);
 
     bool                    ClaimUnknownCard(const Player& pl, const CardList& cardlist);
     const int               GetUnknownClaims() const;

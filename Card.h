@@ -12,6 +12,9 @@ class Card;
 using CardPtr  = std::shared_ptr<Card>;
 using CardList = std::vector<CardPtr>;
 
+class Kwartet;
+using KwartetList = std::vector<Kwartet>;
+
 class Card : public CardBase
 {
   public:
@@ -20,7 +23,7 @@ class Card : public CardBase
     void                  NotOwnedBy(const int playerId);
     const std::list<int>& GetNotOwnedByPlayers() const;
 
-    bool Check(std::vector<Player>& players);
+    bool Check(std::vector<Player>& players, KwartetList& kwartets);
 
   private:
     const int      kwartetId;

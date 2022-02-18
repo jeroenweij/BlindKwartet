@@ -16,7 +16,7 @@ Cards::Cards(const int numCards, const PlayerList& players)
     }
 }
 
-bool Cards::CheckInit(const int numCards) const
+bool Cards::CheckInit(const int numCards)
 {
     if (cards.size() != numCards)
     {
@@ -27,7 +27,7 @@ bool Cards::CheckInit(const int numCards) const
         return false;
     }
 
-    for (const Kwartet& kw : kwartets)
+    for (Kwartet& kw : kwartets)
     {
         if (!kw.IsValid(cards))
         {

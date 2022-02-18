@@ -11,7 +11,7 @@ class Cards
   public:
     Cards(const int numCards, const PlayerList& players);
 
-    bool CheckInit(const int numCards) const;
+    bool CheckInit(const int numCards);
 
     const KwartetList& GetKwartets() const;
     KwartetList&       GetKwartetsMutable();

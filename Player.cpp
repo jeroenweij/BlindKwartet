@@ -51,3 +51,17 @@ void Player::ClaimCard(CardPtr card)
     ClaimedCards(1);
     card->Claim(GetId());
 }
+
+const int Player::GetKwartetCount(const KwartetList& kwartets) const
+{
+    int count = 0;
+
+    for (const Kwartet& kw : kwartets)
+    {
+        if (kw.GetOwner() == GetId())
+        {
+            count++;
+        }
+    }
+    return count;
+}
