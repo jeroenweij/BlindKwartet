@@ -9,7 +9,7 @@ Kwartetter::Kwartetter(InputInterface& input, PlayerList& players, const int num
     players(players),
     cards(numCards, players),
     stop(false),
-    dontSelectNextPlayer(true)
+    nextPlayer(-1)
 {
     windows.push(std::make_shared<MainScreen>(players, cards));
 }
@@ -25,18 +25,39 @@ bool Kwartetter::CheckInit(const int numCards)
 
 void Kwartetter::Start()
 {
-    while (HasAnywoneKwartet())
+    while (HasAnywoneKwartet() && !stop)
     {
     }
 
     while (GameIsRunning())
     {
-        Player& pl = GetNextPlayer();
-        std::cout << "\n\nSpeler " << pl.Name() << " is aan zet" << std::endl;
-        // check if quartet
-        Player&  pl2  = AskUser("Aan wie word een kaart gevraagd");
-        Kwartet& kw   = AskKwartet();
-        CardPtr  card = AskKwartetCard(kw.GetId());
+        bool valid = true;
+
+        Player& pl = GetNextPlayer(valid);
+        if (!valid)
+        {
+            continue;
+        }
+
+        std::cout << std::endl;
+        std::cout << "Speler " << pl.Name() << " is aan zet" << std::endl;
+        Player& pl2 = AskUser("Aan wie word een kaart gevraagd", valid);
+        if (!valid)
+        {
+            continue;
+        }
+
+        Kwartet& kw = AskKwartet(valid);
+        if (!valid)
+        {
+            continue;
+        }
+        CardPtr card = AskKwartetCard(kw.GetId(), valid);
+        if (!valid)
+        {
+            continue;
+        }
+
         if (!CheckPlayerHasCardInSeries(pl, kw))
         {
             break;
@@ -83,11 +104,11 @@ bool Kwartetter::CheckPlayer2Answer(Player& pl1, Player& pl2, const CardPtr card
         pl2.LostCard();
         pl1.AddCard();
         card->Claim(pl1.GetId());
-        dontSelectNextPlayer = true;
         return CheckNewKwartet(pl1, kw);
     }
     else
     {
+        nextPlayer = pl2.GetId();
         if (card->GetOwner() == pl2.GetId())
         {
             std::stringstream ss;
@@ -144,6 +165,7 @@ bool Kwartetter::CheckNewKwartet(Player& pl1, Kwartet& kw)
     }
 
     int missing = 4 - playerclaimed - (kw.PlayerHasUnnamedCard(pl1.GetId()) ? 1 : 0);
+
     if (pl1.CardsUnclaimed() < missing)
     {
         std::cout << "player " << pl1.Name() << " heeft niet genoeg vrije kaarten om het kwartet " << kw.GetName() << " te heben" << std::endl;
@@ -197,50 +219,32 @@ bool Kwartetter::CheckPlayerHasCardInSeries(Player& pl, Kwartet& kw)
     return false;
 }
 
-Player& Kwartetter::GetNextPlayer()
+Player& Kwartetter::GetNextPlayer(bool& validAns)
 {
-    static Player* pl = &AskUser("Wie is er aan de beurt?");
-
-    bool ok = false;
-
-    while (!ok)
+    if (nextPlayer >= 0 && nextPlayer < players.size())
     {
-        if (!dontSelectNextPlayer)
-        {
-            bool get = false;
-            for (Player& p : players)
-            {
-                if (p.GetId() == pl->GetId())
-                {
-                    get = true;
-                }
-                else if (get)
-                {
-                    pl  = &p;
-                    get = false;
-                    break;
-                }
-            }
-            if (get)
-            {
-                pl = &players.front();
-            }
-        }
-
-        dontSelectNextPlayer = false;
         std::stringstream s;
-        s << "Is player " << pl->Name() << " aan de beurt?";
-        ok = Ask(s.str());
+        s << "Is speler " << players.at(nextPlayer).Name() << " aan de beurt?";
+        if (Ask(s.str()))
+        {
+            validAns = true;
+            return players.at(nextPlayer);
+        }
     }
-    return *pl;
+
+    Player& newUser = AskUser("Wie is er aan de beurt?", validAns);
+    nextPlayer      = newUser.GetId();
+    return newUser;
 }
 
 bool Kwartetter::Ask(std::string question)
 {
+    std::cout << std::endl;
     std::cout << question << " [y/n]";
     std::string ans = input.GetString();
 
     char c = std::tolower(ans.c_str()[0]);
+
     return (c == 'y' || c == 'j');
 }
 
@@ -252,9 +256,12 @@ std::string Kwartetter::AskString(std::string question)
     return input.GetString();
 }
 
-Player& Kwartetter::AskUser(std::string question)
+Player& Kwartetter::AskUser(std::string question, bool& validAns)
 {
+    std::cout << std::endl;
     std::cout << question << ":" << std::endl;
+    validAns = false;
+
     for (const Player& pl : players)
     {
         std::cout << pl.GetId() + 1 << ": " << pl.Name() << std::endl;
@@ -263,6 +270,7 @@ Player& Kwartetter::AskUser(std::string question)
 
     if (ans <= players.size() && ans > 0)
     {
+        validAns = true;
         return players.at(ans - 1);
     }
     return players.back();
@@ -272,7 +280,13 @@ bool Kwartetter::HasAnywoneKwartet()
 {
     if (Ask("Heeft iemand kwartet?"))
     {
-        Player& player = AskUser("Wie heeft een kwartet?");
+        bool    valid  = false;
+        Player& player = AskUser("Wie heeft een kwartet?", valid);
+        if (!valid)
+        {
+            return true;
+        }
+
         std::cout << "Speler: " << player.Name() << " heeft een kwartet" << std::endl;
         if (UnclaimedKwartetAvailable())
         {
@@ -304,8 +318,9 @@ bool Kwartetter::HasAnywoneKwartet()
     return false;
 }
 
-Kwartet& Kwartetter::AskKwartet()
+Kwartet& Kwartetter::AskKwartet(bool& valid)
 {
+    std::cout << std::endl;
     std::cout << "Uit welke serie word er gevraagd:" << std::endl;
     std::cout << "0: Nieuwe serie" << std::endl;
     for (const Kwartet& kw : cards.GetKwartets())
@@ -315,6 +330,7 @@ Kwartet& Kwartetter::AskKwartet()
             std::cout << (kw.GetId() + 1) << ": " << kw.GetName() << std::endl;
         }
     }
+    valid   = false;
     int ans = input.GetInt(cards.GetKwartets().size());
 
     if (ans == 0)
@@ -328,26 +344,30 @@ Kwartet& Kwartetter::AskKwartet()
         }
         kwptr->SetName(AskString("Hoe heet deze serie: "));
 
+        valid = true;
         return *kwptr;
     }
 
-    if (ans <= cards.GetKwartets().size())
+    if (ans >= 0 && ans <= cards.GetKwartets().size())
     {
         Kwartet& kw = cards.GetKwartetsMutable().at(ans - 1);
         if (!kw.IsNamed())
         {
             kw.SetName(AskString("Hoe heet deze serie: "));
         }
+        valid = true;
         return kw;
     }
     return cards.GetKwartetsMutable().back();
 }
 
-CardPtr Kwartetter::AskKwartetCard(const int kwId)
+CardPtr Kwartetter::AskKwartetCard(const int kwId, bool& valid)
 {
+    std::cout << std::endl;
     std::cout << "Welke kaart word er gevraagd:" << std::endl;
     std::cout << "0: Nieuwe kaart" << std::endl;
 
+    valid      = false;
     int offset = -1;
     int count  = 1;
 
@@ -379,16 +399,18 @@ CardPtr Kwartetter::AskKwartetCard(const int kwId)
         }
         card->SetName(AskString("Hoe heet deze kaart: "));
 
+        valid = true;
         return card;
     }
 
-    if (ans < cards.GetCards().size())
+    if (ans >= 0 && ans < cards.GetCards().size())
     {
         CardPtr card = cards.GetCards().at(offset + ans - 1);
         if (!card->IsNamed())
         {
             card->SetName(AskString("Hoe heet deze kaart: "));
         }
+        valid = true;
         return card;
     }
     return nullptr;

@@ -20,17 +20,17 @@ class Kwartetter
   private:
     bool        Ask(std::string question);
     std::string AskString(std::string question);
-    Player&     AskUser(std::string question);
+    Player&     AskUser(std::string question, bool& validAns);
     bool        HasAnywoneKwartet();
-    Kwartet&    AskKwartet();
-    CardPtr     AskKwartetCard(const int kwId);
+    Kwartet&    AskKwartet(bool& valid);
+    CardPtr     AskKwartetCard(const int kwId, bool& valid);
 
     const bool UnclaimedKwartetAvailable() const;
     Kwartet&   UnclaimedKwartetGet();
     Kwartet*   UnNamedKwartetGet();
     CardPtr    UnNamedCardGet(const int kwId);
 
-    Player& GetNextPlayer();
+    Player& GetNextPlayer(bool& validAns);
 
     bool CheckPlayerHasCardInSeries(Player& pl, Kwartet& kw);
     bool CheckPlayer2Answer(Player& pl1, Player& pl2, const CardPtr card, Kwartet& kw);
@@ -45,5 +45,5 @@ class Kwartetter
     Cards           cards;
     WindowStack     windows;
     bool            stop;
-    bool            dontSelectNextPlayer;
+    int             nextPlayer;
 };

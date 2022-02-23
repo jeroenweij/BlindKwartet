@@ -13,7 +13,7 @@ int Input::GetInt(const int max)
     std::string ans;
     int         i = -100;
 
-    while (i < 0 || i > max)
+    while (i < -1 || i > max)
     {
         try
         {
