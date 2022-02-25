@@ -1,11 +1,18 @@
+#include <ctime>
+#include <iomanip>
 #include <iostream>
+#include <sstream>
 #include <string>
 
 #include "Input.h"
 
 Input::Input()
 {
-    fileOut.open("Replay.txt");
+    std::stringstream ss;
+    auto              t  = std::time(nullptr);
+    auto              tm = *std::localtime(&t);
+    ss << "Replay_" << std::put_time(&tm, "%d-%m-%Y_%H-%M-%S") << ".txt";
+    fileOut.open(ss.str());
 }
 
 int Input::GetInt(const int max)
